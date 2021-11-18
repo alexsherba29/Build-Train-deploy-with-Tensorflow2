@@ -151,4 +151,4 @@ def train(path_to_data, batch_size, epochs):
 if __name__ == "__main__":
 
     path_to_data = '/media/alex/Acer/Alex/dataset/food-11/'
-    train(path_to_data, 2, 10)
+    train(path_to_data, 2, 20)
