@@ -110,11 +110,3 @@ if __name__ == '__main__':
         print(f"mean height = {mean_height}")
         print(f"median width = {median_width}")
         print(f"median height = {median_height}")
-
-
-
-
-
-
-
-ד
