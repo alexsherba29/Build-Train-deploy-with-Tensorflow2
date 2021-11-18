@@ -82,13 +82,13 @@ def get_images_sizes(path_to_data):
 
 if __name__ == '__main__':
 
-    split_data_switch = False
-    visualize_data_switch = False
+    split_data_switch = True
+    visualize_data_switch = True
     print_insights_switch = True
 
-    path_to_train_data = '/home/nourislam/Downloads/218640_473358_bundle_archive/food-11/training/'
-    path_to_val_data = '/home/nourislam/Downloads/218640_473358_bundle_archive/food-11/validation/'
-    path_to_eval_data = '/home/nourislam/Downloads/218640_473358_bundle_archive/food-11/evaluation/'
+    path_to_train_data = '/media/alex/Acer/Alex/dataset/food-11/training/'
+    path_to_val_data = '/media/alex/Acer/Alex/dataset/food-11/validation/'
+    path_to_eval_data = '/media/alex/Acer/Alex/dataset/food-11/evaluation/'
 
 
     if split_data_switch :
@@ -117,3 +117,4 @@ if __name__ == '__main__':
 
 
 
+ד
