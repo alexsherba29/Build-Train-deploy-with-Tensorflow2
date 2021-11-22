@@ -1,6 +1,7 @@
 # docker build -f Dockerfile -t food_trainer:test0 .
+# docker run --gpus all --rm -it  food_trainer:test0-gpu
 
-FROM tensorflow/tensorflow:latest
+FROM tensorflow/tensorflow:latest-gpu
 
 WORKDIR /usr/src/app
 
