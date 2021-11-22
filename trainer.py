@@ -5,7 +5,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import SGD, Adam
 from tensorflow.python.client import device_lib
 from sklearn.metrics import classification_report, confusion_matrix
-
+import argparse
 import os
 import numpy as np
 
@@ -153,5 +153,12 @@ def train(path_to_data, batch_size, epochs):
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--batch_size", type=int, help="Batch size used by the deep learning model", 
+                        default=2)
+
+    args = parser.parse_args()
+
     path_to_data = '/usr/src/app/dataset/food-11'
-    train(path_to_data, 2, 30)
+    train(path_to_data, args.batch_size, 30)
