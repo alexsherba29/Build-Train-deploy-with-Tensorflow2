@@ -3,7 +3,7 @@ from tensorflow.keras.applications import InceptionV3
 from tensorflow.keras.layers import Dropout, Flatten, Dense, Input
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import SGD, Adam
-
+from tensorflow.python.client import device_lib
 from sklearn.metrics import classification_report, confusion_matrix
 
 import os
@@ -11,6 +11,9 @@ import numpy as np
 
 # os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+
+print("Tensorflow is running on following devices : ")
+print(device_lib.list_local_devices())
 
 def build_model(nbr_classes):
 
@@ -22,7 +25,7 @@ def build_model(nbr_classes):
     head_model = Dropout(0.5)(head_model)
     head_model = Dense(nbr_classes, activation="softmax")(head_model)
 
-    model = Model(inputs=base_model.input, outputs=head_model)
+    model = Model(inputs=base_model.input, outputs=head_model)  
 
     for layer in base_model.layers:
         layer.trainable = False
