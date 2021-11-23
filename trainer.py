@@ -148,7 +148,7 @@ def train(path_to_data, batch_size, epochs, learning_rate):
         verbose=1
     )
 
-    model.fit_generator(
+    Model.fit(
         train_generator,
         steps_per_epoch=total_train_imgs // batch_size,
         validation_data=val_generator,
@@ -159,7 +159,7 @@ def train(path_to_data, batch_size, epochs, learning_rate):
 
     print("[INFO] Evaluation phase...")
 
-    predictions = model.predict_generator(eval_generator)
+    predictions = Model.predict(eval_generator)
     predictions_idxs = np.argmax(predictions, axis=1)
 
     my_classification_report = classification_report(eval_generator.classes, predictions_idxs, 
@@ -175,7 +175,7 @@ def train(path_to_data, batch_size, epochs, learning_rate):
 
 
     print("Starting evaluation using model.evaluate_generator")
-    scores = model.evaluate_generator(eval_generator)
+    scores = Model.evaluate(eval_generator)
     print("Done evaluating!")
     loss = scores[0]
     print(f"loss for hyptertune = {loss}")

@@ -16,7 +16,7 @@ app.config["IMAGE_UPLOADS"] = './static'
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPEG", "JPG", "PNG"]
 
 
-#food_prediction_model = tf.keras.models.load_model('./deeplearning_model')
+food_prediction_model = tf.keras.models.load_model('./deeplearning_model')
 
 
 def allowed_image(filename):
@@ -67,8 +67,23 @@ def showing_image(image_name):
 
     if request.method == 'POST':
 
-        pass
-    
+        image_path = os.path.join(app.config["IMAGE_UPLOADS"], image_name)
+
+        image = cv2.imread(image_path) #BGR
+        img = image.copy()
+        image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        image = cv2.resize(image, (229,229))
+        image = image.astype("float32")
+        image = image / 255.0
+        np_image = np.expand_dims(image, axis=0) # (229,229,3) --> (1,229,229,3)
+
+        predictions = food_prediction_model(np_image)
+        predicted_class_idx = np.argmax(predictions) # [0.1, 0.5, 0.3] --> 1
+        probability = np.max(predictions)
+        predicted_class = food_classes[predicted_class_idx]
+
+        return render_template("prediction_result.html", image_name=image_name, predicted_class=predicted_class, probability=probability)
+
 
     return render_template("showing_image.html", value=image_name)
 
@@ -82,5 +97,4 @@ if __name__ == '__main__':
 
 
     
-
 
