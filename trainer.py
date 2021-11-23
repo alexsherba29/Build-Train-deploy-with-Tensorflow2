@@ -3,9 +3,14 @@ from tensorflow.keras.applications import InceptionV3
 from tensorflow.keras.layers import Dropout, Flatten, Dense, Input
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import SGD, Adam
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.python.client import device_lib
+import hypertune
+
 from sklearn.metrics import classification_report, confusion_matrix
+
 import argparse
+
 import os
 import numpy as np
 
@@ -14,6 +19,11 @@ os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 print("Tensorflow is running on following devices : ")
 print(device_lib.list_local_devices())
+
+
+#from DataHandler import download_data_to_local_directory
+
+
 
 def build_model(nbr_classes):
 
@@ -25,7 +35,7 @@ def build_model(nbr_classes):
     head_model = Dropout(0.5)(head_model)
     head_model = Dense(nbr_classes, activation="softmax")(head_model)
 
-    model = Model(inputs=base_model.input, outputs=head_model)  
+    model = Model(inputs=base_model.input, outputs=head_model)
 
     for layer in base_model.layers:
         layer.trainable = False
@@ -95,7 +105,7 @@ def get_number_of_imgs_inside_folder(directory):
     return totalcount
 
 
-def train(path_to_data, batch_size, epochs):
+def train(path_to_data, batch_size, epochs, learning_rate):
 
     path_train_data = os.path.join(path_to_data, 'training')
     path_val_data = os.path.join(path_to_data, 'validation')
@@ -119,16 +129,32 @@ def train(path_to_data, batch_size, epochs):
 
     model = build_model(nbr_classes=len(classes_dict.keys()))
 
-    optimizer = Adam(lr=1e-5)
+    optimizer = Adam(lr=learning_rate)#1e-5
 
     model.compile(loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
+
+    early_stopping = EarlyStopping(monitor='val_loss', patience=5)
+
+    path_to_save_model = './deeplearning_model'
+    if not os.path.isdir(path_to_save_model):
+        os.makedirs(path_to_save_model)
+
+    ckpt_saver = ModelCheckpoint(
+        path_to_save_model,
+        monitor="val_accuracy",
+        mode='max',
+        save_best_only=True,
+        save_freq='epoch',
+        verbose=1
+    )
 
     model.fit_generator(
         train_generator,
         steps_per_epoch=total_train_imgs // batch_size,
         validation_data=val_generator,
         validation_steps=total_val_imgs // batch_size,
-        epochs=epochs
+        epochs=epochs,
+        callbacks=[early_stopping, ckpt_saver]
     )
 
     print("[INFO] Evaluation phase...")
@@ -148,6 +174,16 @@ def train(path_to_data, batch_size, epochs):
     print(my_confusion_matrix)
 
 
+    print("Starting evaluation using model.evaluate_generator")
+    scores = model.evaluate_generator(eval_generator)
+    print("Done evaluating!")
+    loss = scores[0]
+    print(f"loss for hyptertune = {loss}")
+    
+    hpt = hypertune.HyperTune()
+    hpt.report_hyperparameter_tuning_metric(hyperparameter_metric_tag='loss', 
+                                            metric_value=loss, global_step=epochs)
+
 
 
 
@@ -158,7 +194,10 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, help="Batch size used by the deep learning model", 
                         default=2)
 
+    parser.add_argument("--learning_rate", type=float, help="Batch size used by the deep learning model", 
+                        default=1e-5)
+
     args = parser.parse_args()
 
-    path_to_data = '/usr/src/app/dataset/food-11'
-    train(path_to_data, args.batch_size, 30)
+    path_to_data = '/media/alex/Acer/Alex/dataset/food-11'
+    train(path_to_data, args.batch_size, 5, args.learning_rate )
