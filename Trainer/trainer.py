@@ -148,7 +148,7 @@ def train(path_to_data, batch_size, epochs, learning_rate):
         verbose=1
     )
 
-    Model.fit(
+    model.fit(
         train_generator,
         steps_per_epoch=total_train_imgs // batch_size,
         validation_data=val_generator,
