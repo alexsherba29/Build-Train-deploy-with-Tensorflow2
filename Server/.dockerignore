@@ -1,0 +1,4 @@
+*.jpg
+static/
+__pycache__
+.dockerignore
